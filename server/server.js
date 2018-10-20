@@ -6,12 +6,16 @@ const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const fs = require('fs');
 const imgurUploader = require('imgur-uploader');
+const algoliasearch = require('algoliasearch');
 const Clarifai = require("clarifai");
 
 // instantiate a new Clarifai app passing in your api key.
 const clarifaiApp = new Clarifai.App({
     apiKey: "6182d998e9d54bc3aaa8a9f08c727c2f"
 });
+
+var algoliaClient = algoliasearch('EQJPKC2WRW', '33df16fbf61506d9543a071a64a7f7cb');
+var algoliaIndex = algoliaClient.initIndex('items');
 
 const app = express();
 
@@ -52,6 +56,26 @@ app.post('/upload', (req, res, next) => {
                             confidence: e.value * 100 + "%"
                         };
                     });
+
+                    const items = {
+                        title: "Sample Product",
+                        image: uploadedImageUrl,
+                        keywords: concepts.map(e => e.name)
+                    }
+
+                    // ADD ITEM TO ALGOLIA DATABASE
+                    console.log('adding now...');
+
+                    algoliaIndex.addObject(items, function (err, content) {
+                        console.log(content);
+                        console.log(err);
+
+                    });
+
+                    console.log('done adding');
+
+
+                    // RESPOND TO CLIENT WITH URL AND KEYWORDS
                     res.json({
                         file: uploadedImageUrl,
                         evaluation: clean
