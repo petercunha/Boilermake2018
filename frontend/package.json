@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "mongodb-stitch-browser-sdk": "^4.0.15-0",
+    "mongodb-stitch-browser-services-aws": "^4.0.15-0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-instantsearch-dom": "^5.3.1",
