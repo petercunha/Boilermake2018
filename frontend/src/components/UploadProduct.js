@@ -8,7 +8,9 @@ class UploadProduct extends Component {
         this.state = {
             imageURL: "",
             evaluation: [],
-            loading: false
+            loading: false,
+            titleValue: "",
+            priceValue: 0
         };
     }
 
@@ -17,6 +19,8 @@ class UploadProduct extends Component {
             const data = new FormData();
             data.append("file", file);
             data.append("filename", fileName);
+            data.append("title", this.state.titleValue)
+            data.append("price", this.state.priceValue)
             fetch("http://localhost:8000/upload", {
                 method: "POST",
                 body: data
@@ -40,6 +44,14 @@ class UploadProduct extends Component {
         }
     }
 
+    handleTitleChange(event) {
+        this.setState({ titleValue: event.target.value });
+    }
+
+    handlePriceChange(event) {
+        this.setState({ priceValue: event.target.value });
+    }
+
     render() {
         const imageUrl = this.state.imageURL;
 
@@ -50,17 +62,18 @@ class UploadProduct extends Component {
             </div>
         );
 
+
         return (
             <>
                 <Row>
                     <Col span={20}>
-                        <Input addonBefore="Title" placeholder="Name your product" />
+                        <Input value={this.state.titleValue} defaultValue={this.state.titleValue} onChange={this.handleTitleChange.bind(this)} addonBefore="Title" placeholder="Name your product" />
                     </Col>
                 </Row>
                 <br />
                 <Row>
                     <Col span={20}>
-                        <InputNumber placeholder="Price" />
+                        <Input value={this.state.priceValue} defaultValue={this.state.priceValue} onChange={this.handlePriceChange.bind(this)} placeholder="Price" />
                     </Col>
                 </Row>
                 <br />

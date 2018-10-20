@@ -40,7 +40,7 @@ function Product({ hit }) {
             <Meta
                 avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
                 title={hit.title}
-                description={hit.keywords}
+                description={hit.price}
             />
         </Card >
     )

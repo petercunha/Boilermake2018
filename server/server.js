@@ -28,7 +28,6 @@ app.use(fileUpload());
 app.use('/', express.static(__dirname + '/public'));
 
 app.post('/upload', (req, res, next) => {
-    // console.log(req.files.file);
     let imageFile = req.files.file;
     let fullFileName = `${__dirname}/public/${req.files.file.name}`
 
@@ -58,7 +57,8 @@ app.post('/upload', (req, res, next) => {
                     });
 
                     const items = {
-                        title: "Sample Product",
+                        title: req.body.title,
+                        price: req.body.test,
                         image: uploadedImageUrl,
                         keywords: concepts.map(e => e.name)
                     }
