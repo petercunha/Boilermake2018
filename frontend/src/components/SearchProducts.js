@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import {
-    InstantSearch,
-    Hits,
-    SearchBox
-} from 'react-instantsearch-dom';
+import { InstantSearch, Hits, SearchBox } from 'react-instantsearch-dom';
+import { Card, Icon, Avatar, Row, Col } from 'antd';
+import './SearchProducts.css'
+
+const { Meta } = Card
 
 class SearchProduct extends Component {
     constructor(props) {
@@ -28,7 +28,22 @@ class SearchProduct extends Component {
 }
 
 function Product({ hit }) {
-    return <img src={hit.image} alt={hit.title} />;
+    return (
+        <Card
+            style={{ width: 300 }}
+            cover={
+                <div style={{ height: 250, overflow: 'hidden' }}>
+                    <img alt={hit.title} width={300} src={hit.image} />
+                </div>
+            }
+            actions={[<a><Icon type="shopping-cart" /> Buy now</a>]}>
+            <Meta
+                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                title={hit.title}
+                description={hit.keywords}
+            />
+        </Card >
+    )
 }
 
 export default SearchProduct;

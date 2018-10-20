@@ -1,0 +1,20 @@
+.ais-Hits-item, .ais-InfiniteHits-item, .ais-InfiniteResults-item, .ais-Results-item {
+    border: none;
+    box-shadow: none;
+    width: calc(100% - 1rem);
+    align-content: center;
+}
+
+/* For tablets: */
+@media only screen and (min-width: 600px) {
+    .ais-Hits-item, .ais-InfiniteHits-item, .ais-InfiniteResults-item, .ais-Results-item {
+        width: calc(100% - 1rem);
+    }
+}
+
+/* For desktop: */
+@media only screen and (min-width: 768px) {
+    .ais-Hits-item, .ais-InfiniteHits-item, .ais-InfiniteResults-item, .ais-Results-item {
+        width: calc(33% - 1rem);
+    }
+}
