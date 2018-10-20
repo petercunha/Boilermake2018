@@ -8,9 +8,10 @@ class UploadProduct extends Component {
         this.state = {
             imageURL: "",
             evaluation: [],
+            productSent: false,
             loading: false,
             titleValue: "",
-            priceValue: 0
+            priceValue: ""
         };
     }
 
@@ -73,7 +74,7 @@ class UploadProduct extends Component {
                 <br />
                 <Row>
                     <Col span={20}>
-                        <Input value={this.state.priceValue} defaultValue={this.state.priceValue} onChange={this.handlePriceChange.bind(this)} placeholder="Price" />
+                        <Input value={this.state.priceValue} defaultValue={this.state.priceValue} onChange={this.handlePriceChange.bind(this)} addonBefore="$" placeholder="0.00" />
                     </Col>
                 </Row>
                 <br />

@@ -58,7 +58,7 @@ app.post('/upload', (req, res, next) => {
 
                     const items = {
                         title: req.body.title,
-                        price: req.body.test,
+                        price: req.body.price,
                         image: uploadedImageUrl,
                         keywords: concepts.map(e => e.name)
                     }

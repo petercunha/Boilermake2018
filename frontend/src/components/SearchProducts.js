@@ -38,9 +38,8 @@ function Product({ hit }) {
             }
             actions={[<a><Icon type="shopping-cart" /> Buy now</a>]}>
             <Meta
-                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
                 title={hit.title}
-                description={hit.price}
+                description={`$${hit.price}`}
             />
         </Card >
     )
