@@ -16,17 +16,18 @@ app.use(cookieParser());
 app.use(fileUpload());
 app.use('/', express.static(__dirname + '/public'));
 
-
 app.post('/upload', (req, res, next) => {
-    console.log(req);
+    console.log(req.files.file);
     let imageFile = req.files.file;
 
-    imageFile.mv(`${__dirname}/public/${req.body.filename}.jpg`, function (err) {
+    imageFile.mv(`${__dirname}/public/${req.files.file.name}`, function (err) {
         if (err) {
             return res.status(500).send(err);
         }
 
-        res.json({ file: `public/${req.body.filename}.jpg` });
+        res.json({
+            file: `${req.files.file.name}`
+        });
     });
 
 })
@@ -46,7 +47,7 @@ app.use(function (err, req, res, next) {
 
     // render the error page
     res.status(err.status || 500);
-    res.render('error');
+    res.send('error');
 });
 
 app.listen(8000, () => {
