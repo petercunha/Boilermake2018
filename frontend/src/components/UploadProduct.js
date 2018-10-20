@@ -6,41 +6,60 @@ class UploadProduct extends Component {
         super(props);
 
         this.state = {
-            imageURL: "",
+            imageURL: null,
             evaluation: [],
             productSent: false,
             loading: false,
+            file: null,
+            buttonText: "Submit",
             titleValue: "",
-            priceValue: ""
+            priceValue: "",
+            warningText: ""
         };
     }
 
-    handleUploadImage = (file, fileName) => {
-        if (this.state.imageURL === "") {
-            const data = new FormData();
-            data.append("file", file);
-            data.append("filename", fileName);
-            data.append("title", this.state.titleValue)
-            data.append("price", this.state.priceValue)
-            fetch("http://localhost:8000/upload", {
-                method: "POST",
-                body: data
-            }).then(response => {
-                response.json().then(body => {
-                    this.setState({
-                        imageURL: body.file,
-                        evaluation: body.evaluation,
-                        loading: false,
-                    });
+    handleUploadImage = () => {
+        // Make sure the user has given us input
+        if (this.state.titleValue === "" ||
+            this.state.priceValue === "" ||
+            this.file === null) {
+            this.setState({ warningText: "Please ensure that you've added a title, price, and image." })
+            return
+        } else {
+            this.setState({ warningText: "" })
+        }
+
+        this.setState({ buttonText: "Loading..." })
+        const data = new FormData();
+        data.append("file", this.state.file);
+        data.append("title", this.state.titleValue)
+        data.append("price", this.state.priceValue)
+        fetch("http://localhost:8000/upload", {
+            method: "POST",
+            body: data
+        }).then(response => {
+            response.json().then(body => {
+                this.setState({
+                    imageURL: body.file,
+                    evaluation: body.evaluation,
+                    buttonText: "Product posted!"
                 });
             });
-        }
+        });
     };
 
     handleChange = (info) => {
         if (info.file.status === 'uploading') {
-            this.setState({ loading: true });
-            this.handleUploadImage(info.file.originFileObj, info.file.name)
+            this.setState({
+                file: info.file.originFileObj,
+                loading: true
+            });
+            setTimeout(() => {
+                getBase64(info.file.originFileObj, imageUrl => this.setState({
+                    imageURL: imageUrl,
+                    loading: false,
+                }))
+            }, 1000);
             return;
         }
     }
@@ -86,12 +105,18 @@ class UploadProduct extends Component {
                             className="avatar-uploader"
                             showUploadList={false}
                             onChange={this.handleChange}>
-                            {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
+                            {imageUrl ? <img src={imageUrl} width="100" alt="avatar" /> : uploadButton}
                         </Upload>
                     </Col>
                 </Row>
                 <br />
-                <Button onClick={this.handleUploadImage}>Submit</Button>
+                <Button
+                    disabled={this.state.buttonText !== "Submit"}
+                    onClick={this.handleUploadImage.bind(this)}>
+                    {this.state.buttonText}
+                </Button>
+                <br /><br />
+                <p>{this.state.warningText}</p>
             </>
         );
     }

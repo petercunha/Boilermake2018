@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import HomeComponent from '../components/HomeComponent'
 import UploadProduct from '../components/UploadProduct'
 import SearchProducts from '../components/SearchProducts'
 // import "./App.css";
@@ -13,7 +14,7 @@ class Main extends Component {
     super(props);
     this.state = {
       collapsed: true,
-      selectedComponent: <SearchProducts />
+      selectedComponent: <HomeComponent />
     };
   }
 
@@ -31,7 +32,7 @@ class Main extends Component {
     let toRender;
     switch (event.key) {
       case "1":
-        toRender = <SearchProducts />
+        toRender = <HomeComponent />
         break;
       case "2":
         toRender = <SearchProducts />
