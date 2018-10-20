@@ -7,7 +7,8 @@ class Main extends Component {
     super(props);
 
     this.state = {
-      imageURL: ""
+      imageURL: "",
+      evaluation: []
     };
   }
 
@@ -23,7 +24,10 @@ class Main extends Component {
       body: data
     }).then(response => {
       response.json().then(body => {
-        this.setState({ imageURL: `http://localhost:8000/${body.file}` });
+        this.setState({
+          imageURL: `http://localhost:8000/${body.file}`,
+          evaluation: body.evaluation
+        });
       });
     });
   };
@@ -53,6 +57,10 @@ class Main extends Component {
           <button>Upload</button>
         </div>
         <img src={this.state.imageURL} alt="img" />
+        {this.state.evaluation.map(e => (
+          <p>{e.name}: <i>{e.confidence}</i></p>
+
+        ))}
       </form>
     );
   }
