@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const fs = require('fs');
+const imgurUploader = require('imgur-uploader');
 const Clarifai = require("clarifai");
 
 // instantiate a new Clarifai app passing in your api key.
@@ -23,7 +24,7 @@ app.use(fileUpload());
 app.use('/', express.static(__dirname + '/public'));
 
 app.post('/upload', (req, res, next) => {
-    console.log(req.files.file);
+    // console.log(req.files.file);
     let imageFile = req.files.file;
     let fullFileName = `${__dirname}/public/${req.files.file.name}`
 
@@ -31,30 +32,32 @@ app.post('/upload', (req, res, next) => {
         if (err) {
             return res.status(500).send(err);
         }
-
-        clarifaiApp.models
-            .initModel({
-                id: Clarifai.GENERAL_MODEL,
-                version: "aa7f35c01e0642fda5cf400f543e7c40"
-            })
-            .then(generalModel => {
-                return generalModel.predict(
-                    base64_encode(fullFileName)
-                );
-            })
-            .then(response => {
-                var concepts = response["outputs"][0]["data"]["concepts"];
-                var clean = concepts.map(e => {
-                    return {
-                        name: e.name,
-                        confidence: e.value * 100 + "%"
-                    };
+        imgurUploader(fs.readFileSync(fullFileName), { title: 'image' }).then(data => {
+            let uploadedImageUrl = data.link
+            clarifaiApp.models
+                .initModel({
+                    id: Clarifai.GENERAL_MODEL,
+                    version: "aa7f35c01e0642fda5cf400f543e7c40"
+                })
+                .then(generalModel => {
+                    return generalModel.predict(
+                        uploadedImageUrl
+                    );
+                })
+                .then(response => {
+                    var concepts = response["outputs"][0]["data"]["concepts"];
+                    var clean = concepts.map(e => {
+                        return {
+                            name: e.name,
+                            confidence: e.value * 100 + "%"
+                        };
+                    });
+                    res.json({
+                        file: uploadedImageUrl,
+                        evaluation: clean
+                    });
                 });
-                res.json({
-                    file: `${req.files.file.name}`,
-                    evaluation: clean
-                });
-            });
+        });
     });
 })
 

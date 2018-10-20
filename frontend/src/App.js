@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 
 class Main extends Component {
@@ -25,7 +24,7 @@ class Main extends Component {
     }).then(response => {
       response.json().then(body => {
         this.setState({
-          imageURL: `http://localhost:8000/${body.file}`,
+          imageURL: body.file,
           evaluation: body.evaluation
         });
       });
@@ -59,7 +58,6 @@ class Main extends Component {
         <img src={this.state.imageURL} alt="img" />
         {this.state.evaluation.map(e => (
           <p>{e.name}: <i>{e.confidence}</i></p>
-
         ))}
       </form>
     );

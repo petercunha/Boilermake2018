@@ -17,6 +17,7 @@
     "cors": "^2.8.4",
     "express": "^4.16.4",
     "express-fileupload": "^1.0.0",
+    "imgur-uploader": "^4.2.1",
     "morgan": "^1.9.1",
     "path": "^0.12.7"
   }
