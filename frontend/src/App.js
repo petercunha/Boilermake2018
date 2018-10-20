@@ -13,11 +13,9 @@ class Main extends Component {
 
   handleUploadImage = ev => {
     ev.preventDefault();
-
     const data = new FormData();
-    data.append("file", this.uploadInput.files[0]);
-    data.append("filename", this.fileName.value);
-
+    data.append("file", ev.target.img.files[0]);
+    data.append("filename", ev.target.fileName);
     fetch("http://localhost:8000/upload", {
       method: "POST",
       body: data
@@ -35,18 +33,11 @@ class Main extends Component {
     return (
       <form onSubmit={this.handleUploadImage}>
         <div>
-          <input
-            ref={ref => {
-              this.uploadInput = ref;
-            }}
-            type="file"
-          />
+          <input name="img" type="file" />
         </div>
         <div>
           <input
-            ref={ref => {
-              this.fileName = ref;
-            }}
+            name="fileName"
             type="text"
             placeholder="Enter the desired name of file"
           />
@@ -57,7 +48,9 @@ class Main extends Component {
         </div>
         <img src={this.state.imageURL} alt="img" />
         {this.state.evaluation.map(e => (
-          <p>{e.name}: <i>{e.confidence}</i></p>
+          <p>
+            {e.name}: <i>{e.confidence}</i>
+          </p>
         ))}
       </form>
     );
