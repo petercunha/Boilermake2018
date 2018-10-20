@@ -1,7 +1,30 @@
 import React, { Component } from "react";
-import { Upload, Icon, Button, Input, Row, Col, InputNumber } from 'antd';
+import { Upload, Icon, Button, Input, Row, Col, InputNumber } from "antd";
+import { Stitch, AnonymousCredential } from "mongodb-stitch-browser-sdk";
+import {
+    AwsRequest,
+    AwsServiceClient
+} from "mongodb-stitch-browser-services-aws";
+
+const stitchClient = Stitch.initializeDefaultAppClient("zbay-thbww");
+stitchClient.auth
+    .loginWithCredential(new AnonymousCredential())
+    .then(user => {
+        console.log(user);
+    });
+
+// // Make sure the user has given us input
+// if (this.state.titleValue === "" ||
+//     this.state.priceValue === "" ||
+//     this.file === null) {
+//     this.setState({ warningText: "Please ensure that you've added a title, price, and image." })
+//     return
+// } else {
+//     this.setState({ warningText: "" })
+// }
 
 class UploadProduct extends Component {
+
     constructor(props) {
         super(props);
 
@@ -16,9 +39,65 @@ class UploadProduct extends Component {
             priceValue: "",
             warningText: ""
         };
+
+        this.handleUploadImage = this.handleUploadImage.bind(this);
     }
 
-    handleUploadImage = () => {
+    convertImageToBSONBinaryObject(file) {
+        return new Promise(resolve => {
+            var fileReader = new FileReader();
+            fileReader.onload = event => {
+                resolve({
+                    $binary: {
+                        base64: event.target.result.split(",")[1],
+                        subType: "00"
+                    }
+                });
+            };
+            fileReader.readAsDataURL(file);
+        });
+    }
+
+    async handleUploadImage(file, fileName) {
+        const fileBinary = await this.convertImageToBSONBinaryObject(file);
+        const aws = stitchClient.getServiceClient(
+            AwsServiceClient.factory,
+            "zbay-bucket"
+        );
+        const key = `${stitchClient.auth.user.id}-${fileName}`;
+        const bucket = "zbay-bucket";
+        const url = `http://${bucket}.s3.amazonaws.com/${encodeURIComponent(key)}`;
+        const request = new AwsRequest.Builder()
+            .withService("s3")
+            .withAction("PutObject")
+            .withRegion("us-east-1")
+            .withArgs({
+                ACL: "public-read",
+                Bucket: bucket,
+                ContentType: file.type,
+                Key: key,
+                Body: fileBinary
+            });
+        try {
+            await aws.execute(request.build()).then(result => {
+                console.log(result);
+                console.log(url);
+                this.setState({
+                    imageURL: url,
+                    loading: false,
+                })
+            });
+        } catch (e) {
+            console.log(e);
+            this.setState({
+                imageURL: "",
+                loading: true,
+            })
+        }
+
+    }
+
+    handleButtonClick = () => {
         // Make sure the user has given us input
         if (this.state.titleValue === "" ||
             this.state.priceValue === "" ||
@@ -30,39 +109,79 @@ class UploadProduct extends Component {
         }
 
         this.setState({ buttonText: "Loading..." })
-        const data = new FormData();
-        data.append("file", this.state.file);
-        data.append("title", this.state.titleValue)
-        data.append("price", this.state.priceValue)
-        fetch("http://localhost:8000/upload", {
-            method: "POST",
-            body: data
-        }).then(response => {
-            response.json().then(body => {
-                this.setState({
-                    imageURL: body.file,
-                    evaluation: body.evaluation,
-                    buttonText: "Product posted!"
+
+
+            const data = new FormData();
+            data.append("url", this.state.imageURL);
+            data.append("title", this.state.titleValue);
+            data.append("price", this.state.priceValue);
+            fetch("http://localhost:8000/upload", {
+                method: "POST",
+                body: data
+            }).then(response => {
+                response.json().then(body => {
+                    this.setState({
+                        imageURL: body.file,
+                        evaluation: body.evaluation,
+                        loading: false,
+                        buttonText: "Product posted! Redirecting to homepage..."
+                    });
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 1000)
                 });
             });
-        });
+
+
+
+
+
+
+
+
+        // const data = new FormData();
+        // data.append("file", this.state.file);
+        // data.append("title", this.state.titleValue)
+        // data.append("price", this.state.priceValue)
+        // fetch("http://localhost:8000/upload", {
+        //     method: "POST",
+        //     body: data
+        // }).then(response => {
+        //     response.json().then(body => {
+        //         this.setState({
+        //             imageURL: body.file,
+        //             evaluation: body.evaluation,
+        //             buttonText: "Product posted!"
+        //         });
+        //     });
+        // });
     };
 
-    handleChange = (info) => {
-        if (info.file.status === 'uploading') {
-            this.setState({
-                file: info.file.originFileObj,
-                loading: true
-            });
-            setTimeout(() => {
-                getBase64(info.file.originFileObj, imageUrl => this.setState({
-                    imageURL: imageUrl,
-                    loading: false,
-                }))
-            }, 1000);
+    // handleChange = (info) => {
+    //     if (info.file.status === 'uploading') {
+    //         this.setState({
+    //             file: info.file.originFileObj,
+    //             loading: true
+    //         });
+    //         setTimeout(() => {
+    //             getBase64(info.file.originFileObj, imageUrl => this.setState({
+    //                 imageURL: imageUrl,
+    //                 loading: false,
+    //             }))
+    //         }, 1000);
+    //         return;
+    //     }
+    // }
+
+   
+
+    handleChange = info => {
+        if (info.file.status === "uploading") {
+            this.setState({ loading: true });
+            this.handleUploadImage(info.file.originFileObj, info.file.name);
             return;
         }
-    }
+    };
 
     handleTitleChange(event) {
         this.setState({ titleValue: event.target.value });
@@ -77,23 +196,34 @@ class UploadProduct extends Component {
 
         const uploadButton = (
             <div>
-                <Icon type={this.state.loading ? 'loading' : 'plus'} />
+                <Icon type={this.state.loading ? "loading" : "plus"} />
                 <div className="ant-upload-text">Upload</div>
             </div>
         );
-
 
         return (
             <>
                 <Row>
                     <Col span={20}>
-                        <Input value={this.state.titleValue} defaultValue={this.state.titleValue} onChange={this.handleTitleChange.bind(this)} addonBefore="Title" placeholder="Name your product" />
+                        <Input
+                            value={this.state.titleValue}
+                            defaultValue={this.state.titleValue}
+                            onChange={this.handleTitleChange.bind(this)}
+                            addonBefore="Title"
+                            placeholder="Name your product"
+                        />
                     </Col>
                 </Row>
                 <br />
                 <Row>
                     <Col span={20}>
-                        <Input value={this.state.priceValue} defaultValue={this.state.priceValue} onChange={this.handlePriceChange.bind(this)} addonBefore="$" placeholder="0.00" />
+                        <Input
+                            value={this.state.priceValue}
+                            defaultValue={this.state.priceValue}
+                            onChange={this.handlePriceChange.bind(this)}
+                            addonBefore="$"
+                            placeholder="0.00"
+                        />
                     </Col>
                 </Row>
                 <br />
@@ -104,15 +234,16 @@ class UploadProduct extends Component {
                             listType="picture-card"
                             className="avatar-uploader"
                             showUploadList={false}
-                            onChange={this.handleChange}>
-                            {imageUrl ? <img src={imageUrl} width="100" alt="avatar" /> : uploadButton}
+                            onChange={this.handleChange}
+                        >
+                            {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
                         </Upload>
                     </Col>
                 </Row>
                 <br />
                 <Button
                     disabled={this.state.buttonText !== "Submit"}
-                    onClick={this.handleUploadImage.bind(this)}>
+                    onClick={this.handleButtonClick.bind(this)}>
                     {this.state.buttonText}
                 </Button>
                 <br /><br />
@@ -120,12 +251,6 @@ class UploadProduct extends Component {
             </>
         );
     }
-}
-
-function getBase64(img, callback) {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(img);
 }
 
 export default UploadProduct;
