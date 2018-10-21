@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Upload, Icon, Button, Input, Row, Col, InputNumber } from "antd";
+import { Upload, Icon, Button, Input, Row, Col } from "antd";
 import { Stitch, AnonymousCredential } from "mongodb-stitch-browser-sdk";
 import {
     AwsRequest,
@@ -10,18 +10,8 @@ const stitchClient = Stitch.initializeDefaultAppClient("zbay-thbww");
 stitchClient.auth
     .loginWithCredential(new AnonymousCredential())
     .then(user => {
-        console.log(user);
+        // console.log(user);
     });
-
-// // Make sure the user has given us input
-// if (this.state.titleValue === "" ||
-//     this.state.priceValue === "" ||
-//     this.file === null) {
-//     this.setState({ warningText: "Please ensure that you've added a title, price, and image." })
-//     return
-// } else {
-//     this.setState({ warningText: "" })
-// }
 
 class UploadProduct extends Component {
 
@@ -80,15 +70,15 @@ class UploadProduct extends Component {
             });
         try {
             await aws.execute(request.build()).then(result => {
-                console.log(result);
-                console.log(url);
+                // console.log(result);
+                // console.log(url);
                 this.setState({
                     imageURL: url,
                     loading: false,
                 })
             });
         } catch (e) {
-            console.log(e);
+            // console.log(e);
             this.setState({
                 imageURL: "",
                 loading: true,
@@ -100,9 +90,8 @@ class UploadProduct extends Component {
     handleButtonClick = () => {
         // Make sure the user has given us input
         if (this.state.titleValue === "" ||
-            this.state.priceValue === "" ||
             this.file === null) {
-            this.setState({ warningText: "Please ensure that you've added a title, price, and image." })
+            this.setState({ warningText: "Please ensure that you've added a title and image." })
             return
         } else {
             this.setState({ warningText: "" })
@@ -111,26 +100,33 @@ class UploadProduct extends Component {
         this.setState({ buttonText: "Loading..." })
 
 
-            const data = new FormData();
-            data.append("url", this.state.imageURL);
-            data.append("title", this.state.titleValue);
-            data.append("price", this.state.priceValue);
-            fetch("http://localhost:8000/upload", {
-                method: "POST",
-                body: data
-            }).then(response => {
-                response.json().then(body => {
-                    this.setState({
-                        imageURL: body.file,
-                        evaluation: body.evaluation,
-                        loading: false,
-                        buttonText: "Product posted! Redirecting to homepage..."
-                    });
-                    setTimeout(() => {
-                        window.location.reload()
-                    }, 1000)
+        const data = new FormData();
+        data.append("url", this.state.imageURL);
+        data.append("title", this.state.titleValue);
+        fetch("http://localhost:8000/upload", {
+            method: "POST",
+            body: data
+        }).then(response => {
+            response.json().then(body => {
+                this.setState({
+                    imageURL: body.file,
+                    evaluation: body.evaluation,
+                    loading: false,
+                    buttonText: "Image posted!",
+                    warningText: (
+                        <>
+                            <b>Image link: </b>
+                            <a href={this.state.imageURL}>{this.state.imageURL}</a>
+                            <br />
+                            <b>Image attributes: </b>
+                            <ul>
+                                {body.evaluation.map(e => <li>{e.name}</li>)}
+                            </ul>
+                        </>
+                    )
                 });
             });
+        });
 
 
 
@@ -173,7 +169,7 @@ class UploadProduct extends Component {
     //     }
     // }
 
-   
+
 
     handleChange = info => {
         if (info.file.status === "uploading") {
@@ -210,19 +206,7 @@ class UploadProduct extends Component {
                             defaultValue={this.state.titleValue}
                             onChange={this.handleTitleChange.bind(this)}
                             addonBefore="Title"
-                            placeholder="Name your product"
-                        />
-                    </Col>
-                </Row>
-                <br />
-                <Row>
-                    <Col span={20}>
-                        <Input
-                            value={this.state.priceValue}
-                            defaultValue={this.state.priceValue}
-                            onChange={this.handlePriceChange.bind(this)}
-                            addonBefore="$"
-                            placeholder="0.00"
+                            placeholder="Name your image"
                         />
                     </Col>
                 </Row>

@@ -2,18 +2,16 @@ import React, { Component } from "react";
 import HomeComponent from '../components/HomeComponent'
 import UploadProduct from '../components/UploadProduct'
 import SearchProducts from '../components/SearchProducts'
-// import "./App.css";
 
-import { Layout, Menu, Icon, Upload } from 'antd';
-const { Header, Content, Sider } = Layout;
-const SubMenu = Menu.SubMenu;
+import { Layout, Menu, Icon } from 'antd';
+const { Content, Sider } = Layout;
 
 class Main extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      collapsed: true,
+      collapsed: false,
       selectedComponent: <HomeComponent />
     };
   }
@@ -71,11 +69,11 @@ class Main extends Component {
               </Menu.Item>
               <Menu.Item key="2">
                 <Icon type="search" />
-                <span>Buy</span>
+                <span>Search</span>
               </Menu.Item>
               <Menu.Item key="3">
-                <Icon type="shopping" />
-                <span>Sell</span>
+                <Icon type="upload" />
+                <span>Upload</span>
               </Menu.Item>
             </Menu>
           </Sider>
