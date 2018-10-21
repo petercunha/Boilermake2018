@@ -13,5 +13,5 @@ Optic Search is an image search engine. Upload any image, and our system will us
 - MongoDB Stitch (Serverless functions to handle image upload and host them in AWS S3.)
 
 ## Authors
-Peter Cunha - [Github profile](https://github.com/petercunha)
-Tianchi Xu - [Github profile](https://github.com/miticm)
+- Peter Cunha - *Full stack* - [Github profile](https://github.com/petercunha)
+- Tianchi Xu - *Frontend and Serverless* - [Github profile](https://github.com/miticm)
