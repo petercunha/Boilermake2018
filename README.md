@@ -3,7 +3,7 @@ Optic Search is an image search engine. Upload any image, and our system will us
 
 ## Demo
 
-[Visit our website](http://opticsearch.net)
+[Visit our website](https://opticsearch.net)
 
 ## Technologies
 
