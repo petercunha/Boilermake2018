@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
 const fs = require("fs");
-const imgurUploader = require("imgur-uploader");
+const path = require("path");
 const algoliasearch = require("algoliasearch");
 const Clarifai = require("clarifai");
 
@@ -28,8 +28,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(fileUpload());
-app.use("/", express.static(__dirname + "/public"));
 
+// Serve react app at the index
+let frontendPath = path.join(__dirname, "..", "frontend", "build");
+console.log(frontendPath);
+
+app.use("/", express.static(frontendPath));
+
+// Handle uploads
 app.post("/upload", (req, res) => {
     const uploadedImageUrl = req.body.url;
     clarifaiApp.models
@@ -92,8 +98,8 @@ function base64_encode(file) {
     return new Buffer(bitmap).toString("base64");
 }
 
-app.listen(8000, () => {
-    console.log("8000");
+app.listen(80, () => {
+    console.log("Listening on port 80");
 });
 
 module.exports = app;

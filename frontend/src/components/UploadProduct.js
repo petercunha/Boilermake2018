@@ -103,7 +103,7 @@ class UploadProduct extends Component {
         const data = new FormData();
         data.append("url", this.state.imageURL);
         data.append("title", this.state.titleValue);
-        fetch("http://localhost:8000/upload", {
+        fetch("/upload", {
             method: "POST",
             body: data
         }).then(response => {
@@ -127,49 +127,7 @@ class UploadProduct extends Component {
                 });
             });
         });
-
-
-
-
-
-
-
-
-        // const data = new FormData();
-        // data.append("file", this.state.file);
-        // data.append("title", this.state.titleValue)
-        // data.append("price", this.state.priceValue)
-        // fetch("http://localhost:8000/upload", {
-        //     method: "POST",
-        //     body: data
-        // }).then(response => {
-        //     response.json().then(body => {
-        //         this.setState({
-        //             imageURL: body.file,
-        //             evaluation: body.evaluation,
-        //             buttonText: "Product posted!"
-        //         });
-        //     });
-        // });
     };
-
-    // handleChange = (info) => {
-    //     if (info.file.status === 'uploading') {
-    //         this.setState({
-    //             file: info.file.originFileObj,
-    //             loading: true
-    //         });
-    //         setTimeout(() => {
-    //             getBase64(info.file.originFileObj, imageUrl => this.setState({
-    //                 imageURL: imageUrl,
-    //                 loading: false,
-    //             }))
-    //         }, 1000);
-    //         return;
-    //     }
-    // }
-
-
 
     handleChange = info => {
         if (info.file.status === "uploading") {
